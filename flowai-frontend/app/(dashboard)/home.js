@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, SafeAreaView, StyleSheet, Text, View } from "react-native";
 
-import { listCustomers } from "../src/api/customers";
+import { listCustomers } from "../../src/api/customers";
 
 export default function DashboardHomeScreen() {
   const [customers, setCustomers] = useState([]);
