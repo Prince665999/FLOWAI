@@ -5,6 +5,9 @@ from app.ai.rag.chroma_store import chroma_store
 from app.db.session import get_db
 from app.dependencies import get_current_active_user
 from app.models.document import Document
+from app.models.job import Job
+from app.queue.idempotency import build_idempotency_key
+from app.queue.tasks.document_tasks import index_document_task
 from app.models.user import User
 from app.schemas.document import DocumentRead
 from app.services.file_service import file_service
@@ -42,19 +45,27 @@ async def upload_document(
             content_type=file.content_type or "application/octet-stream",
             size_bytes=len(content),
             extracted_text=text,
-            status="ready",
+            status="queued",
         )
         db.add(document)
         db.commit()
         db.refresh(document)
-        chroma_store.add_chunks([
-            {
-                "id": f"document-{document.id}-chunk-{index}",
-                "content": chunk,
-                "metadata": {"document_id": document.id, "user_id": user.id, "filename": document.filename, "chunk_index": index},
-            }
-            for index, chunk in enumerate(chunks)
-        ])
+        job = Job(
+            user_id=user.id,
+            job_type="document",
+            idempotency_key=build_idempotency_key("document", user.id, {"document_id": document.id}),
+            payload={"document_id": document.id},
+            status="queued",
+        )
+        db.add(job)
+        db.commit()
+        db.refresh(job)
+        try:
+            task_result = index_document_task.apply_async(args=[job.id, document.id])
+            job.task_id = task_result.id
+            db.commit()
+        except (ConnectionError, OSError):
+            index_document_task.run(job.id, document.id)
         return document
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc

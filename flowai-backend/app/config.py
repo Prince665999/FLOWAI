@@ -25,6 +25,9 @@ class Settings(BaseSettings):
     CHROMA_PERSIST_PATH: str = "./storage/chroma"
     DOCUMENT_MAX_SIZE_BYTES: int = 10 * 1024 * 1024
     EMBEDDING_DIMENSIONS: int = 384
+    QUEUE_ENABLED: bool = True
+    CELERY_TASK_ALWAYS_EAGER: bool = False
+    JOB_MAX_RETRIES: int = 3
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

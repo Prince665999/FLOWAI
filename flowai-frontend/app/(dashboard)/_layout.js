@@ -45,10 +45,20 @@ export default function DashboardLayout() {
       <Drawer.Screen
         name="agents"
         options={{
-          title: "Tool Activity",
-          drawerLabel: "Tool Activity",
+          title: "Agent Activity",
+          drawerLabel: "Agent Activity",
           drawerIcon: ({ color, size }) => (
             <Ionicons name="pulse-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="workflows"
+        options={{
+          title: "Workflows",
+          drawerLabel: "Workflows",
+          drawerIcon: ({ color, size }) => (
+            <Ionicons name="git-branch-outline" size={size} color={color} />
           ),
         }}
       />
