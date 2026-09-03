@@ -42,6 +42,16 @@ export default function DashboardLayout() {
           ),
         }}
       />
+      <Drawer.Screen
+        name="agents"
+        options={{
+          title: "Tool Activity",
+          drawerLabel: "Tool Activity",
+          drawerIcon: ({ color, size }) => (
+            <Ionicons name="pulse-outline" size={size} color={color} />
+          ),
+        }}
+      />
     </Drawer>
   );
 }
