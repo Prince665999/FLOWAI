@@ -1,5 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 
+import { Citations } from "./Citations";
+
 export function MessageBubble({ message }) {
   const isUser = message.role === "user";
   return (
@@ -8,6 +10,7 @@ export function MessageBubble({ message }) {
         <Text style={[styles.text, isUser ? styles.userText : styles.assistantText]}>
           {message.content || " "}
         </Text>
+        {!isUser ? <Citations content={message.content} /> : null}
       </View>
     </View>
   );

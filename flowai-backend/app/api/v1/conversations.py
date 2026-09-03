@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session, joinedload
 
 from app.ai.llm_client import LLMConfigurationError, llm_client
 from app.ai.prompts.business_context import build_business_context_prompt
+from app.ai.rag.retriever import business_retriever
 from app.db.session import get_db
 from app.dependencies import get_current_active_user
 from app.models.conversation import Conversation
@@ -78,7 +79,12 @@ async def stream_message(
         for message in conversation.messages
         if message.role in {"user", "assistant", "system"}
     ]
-    messages = [{"role": "system", "content": build_business_context_prompt(user)}, *history, {"role": "user", "content": payload.content}]
+    context, citations = business_retriever.build_context(payload.content, user.id)
+    context_instruction = (
+        "\n\nRelevant business sources are below. Use them when relevant and cite sources as [Source: filename, section N].\n"
+        f"{context}" if context else ""
+    )
+    messages = [{"role": "system", "content": build_business_context_prompt(user) + context_instruction}, *history, {"role": "user", "content": payload.content}]
 
     async def generate() -> AsyncIterator[str]:
         assistant_content = ""

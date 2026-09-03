@@ -16,11 +16,15 @@ class Settings(BaseSettings):
     REDIS_URL: str = "redis://localhost:6379/0"
     CORS_ORIGINS: list[str] = ["*"]
 
-    GROQ_API_KEY: str | None ="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"
+    GROQ_API_KEY: str | None = None
     GROQ_BASE_URL: str = "https://api.groq.com/openai/v1"
     GROQ_DEFAULT_MODEL: str = "openai/gpt-oss-20b"
     GROQ_POWERFUL_MODEL: str = "openai/gpt-oss-120b"
     LLM_REQUEST_TIMEOUT_SECONDS: float = 60.0
+    DOCUMENT_STORAGE_PATH: str = "./storage/documents"
+    CHROMA_PERSIST_PATH: str = "./storage/chroma"
+    DOCUMENT_MAX_SIZE_BYTES: int = 10 * 1024 * 1024
+    EMBEDDING_DIMENSIONS: int = 384
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
