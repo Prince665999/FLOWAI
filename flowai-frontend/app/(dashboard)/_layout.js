@@ -1,29 +1,37 @@
-import { Tabs } from "expo-router";
+import { Drawer } from "expo-router/drawer";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function DashboardLayout() {
   return (
-    <Tabs
+    <Drawer
       screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: "#2563eb",
-        tabBarInactiveTintColor: "#64748b",
-        tabBarStyle: {
-          backgroundColor: "#0f172a",
-          borderTopColor: "#1e293b",
-          height: 64,
-        },
+        headerStyle: { backgroundColor: "#0f172a" },
+        headerTintColor: "#f8fafc",
+        drawerActiveTintColor: "#2563eb",
+        drawerInactiveTintColor: "#475569",
+        drawerStyle: { backgroundColor: "#f8fafc", width: 280 },
       }}
     >
-      <Tabs.Screen
+      <Drawer.Screen
         name="home"
         options={{
           title: "Home",
-          tabBarIcon: ({ color, size }) => (
+          drawerLabel: "Home",
+          drawerIcon: ({ color, size }) => (
             <Ionicons name="home-outline" size={size} color={color} />
           ),
         }}
       />
-    </Tabs>
+      <Drawer.Screen
+        name="conversations"
+        options={{
+          title: "Assistant",
+          drawerLabel: "Assistant",
+          drawerIcon: ({ color, size }) => (
+            <Ionicons name="chatbubble-ellipses-outline" size={size} color={color} />
+          ),
+        }}
+      />
+    </Drawer>
   );
 }

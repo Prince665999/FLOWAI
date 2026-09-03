@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     REDIS_URL: str = "redis://localhost:6379/0"
     CORS_ORIGINS: list[str] = ["*"]
 
-    GROQ_API_KEY: str | None = None
+    GROQ_API_KEY: str | None ="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"
     GROQ_BASE_URL: str = "https://api.groq.com/openai/v1"
     GROQ_DEFAULT_MODEL: str = "openai/gpt-oss-20b"
     GROQ_POWERFUL_MODEL: str = "openai/gpt-oss-120b"
