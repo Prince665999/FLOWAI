@@ -64,7 +64,7 @@ async def upload_document(
             task_result = index_document_task.apply_async(args=[job.id, document.id])
             job.task_id = task_result.id
             db.commit()
-        except (ConnectionError, OSError):
+        except Exception:
             index_document_task.run(job.id, document.id)
         return document
     except ValueError as exc:

@@ -40,5 +40,6 @@ def read_root() -> dict:
 
 
 @app.get("/health")
+@app.get("/api/v1/health")
 def health_check() -> dict:
     return {"status": "healthy"}

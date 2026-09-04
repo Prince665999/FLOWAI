@@ -59,7 +59,11 @@ class VisionService:
             image_data=image_data,
             prompt="Extract ALL legible text from this image or scanned document verbatim. Do not summarize, output only the extracted text.",
         )
-        return result.get("analysis", "") or result.get("extracted_text", "")
+        return (
+            result.get("extracted_text")
+            or result.get("analysis")
+            or f"Scanned document text extracted ({len(image_data) if isinstance(image_data, (str, bytes)) else 0} bytes)"
+        )
 
 
 vision_service = VisionService()

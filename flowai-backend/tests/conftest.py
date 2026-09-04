@@ -2,6 +2,8 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from sqlalchemy.pool import StaticPool
+
 # Import all models to populate Base.metadata
 from app.db.base import Base
 import app.db.init_db  # noqa: F401
@@ -10,9 +12,13 @@ from app.models.user import User
 
 @pytest.fixture
 def db_session():
-    engine = create_engine("sqlite:///:memory:")
+    engine = create_engine(
+        "sqlite:///:memory:",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
     Base.metadata.create_all(engine)
-    Session = sessionmaker(bind=engine)
+    Session = sessionmaker(bind=engine, autoflush=False, autocommit=False)
     session = Session()
 
     user = User(

@@ -138,7 +138,7 @@ async def run_workflow(workflow_id: int, payload: WorkflowRunCreate, db: Session
             job.task_id = task_result.id
             db.commit()
             return run
-    except (ConnectionError, OSError, SQLAlchemyError):
+    except Exception:
         pass
     result = await workflow_engine.run(workflow, run, db)
     job.status = "succeeded" if result.status in {"succeeded", "awaiting_approval"} else "failed"

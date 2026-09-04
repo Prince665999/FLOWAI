@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import * as DocumentPicker from "expo-document-picker";
-import { ActivityIndicator, FlatList, Pressable, SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { listDocuments, uploadDocument } from "../../../src/api/documents";
 import { useAuth } from "../../../src/hooks/useAuth";

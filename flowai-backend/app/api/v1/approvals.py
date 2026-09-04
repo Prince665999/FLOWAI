@@ -20,6 +20,14 @@ def list_approvals(
     return approval_service.get_approvals(db, user, status=status_filter)
 
 
+@router.get("/pending", response_model=list[ApprovalRead])
+def list_pending_approvals(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_active_user),
+) -> list[Approval]:
+    return approval_service.get_approvals(db, user, status="pending")
+
+
 @router.get("/{approval_id}", response_model=ApprovalRead)
 def get_approval(
     approval_id: int,

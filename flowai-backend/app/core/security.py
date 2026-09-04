@@ -2,9 +2,14 @@ from datetime import datetime, timedelta, timezone
 
 from fastapi import HTTPException, status
 from jose import JWTError, jwt
-from passlib.context import CryptContext
+import bcrypt
+if not hasattr(bcrypt, "__about__"):
+    class _About:
+        __version__ = getattr(bcrypt, "__version__", "4.0.0")
+    bcrypt.__about__ = _About()
 
 from app.config import settings
+from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 ALGORITHM = "HS256"
