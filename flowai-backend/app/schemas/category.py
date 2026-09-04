@@ -22,3 +22,11 @@ class CategoryRead(CategoryCreate):
 	is_active: bool
 	created_at: datetime
 	updated_at: datetime
+
+
+class PublicCategoryRead(BaseModel):
+	model_config = ConfigDict(from_attributes=True)
+	id: int
+	name: str
+	slug: str
+	description: str | None = None

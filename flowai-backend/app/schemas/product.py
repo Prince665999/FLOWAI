@@ -45,3 +45,28 @@ class ProductRead(ProductCreate):
 
 class ProductListRead(ProductRead):
 	available_quantity: int = 0
+
+
+class PublicProductRead(BaseModel):
+	model_config = ConfigDict(from_attributes=True)
+	id: int
+	sku: str
+	name: str
+	slug: str
+	description: str | None = None
+	short_description: str | None = None
+	brand: str | None = None
+	category_id: int | None = None
+	price_amount: int
+	currency: str
+	image_url: str | None = None
+	specifications: dict[str, Any] = Field(default_factory=dict)
+	available_quantity: int
+
+
+class PublicProductPage(BaseModel):
+	items: list[PublicProductRead]
+	page: int
+	page_size: int
+	total: int
+	total_pages: int
