@@ -95,6 +95,8 @@ export default function DashboardLayout() {
           ),
         }}
       />
+      <Drawer.Screen name="products" options={{ title: "Products", drawerLabel: "Products", drawerIcon: ({ color, size }) => <Ionicons name="pricetags-outline" size={size} color={color} /> }} />
+      <Drawer.Screen name="inventory" options={{ title: "Inventory", drawerLabel: "Inventory", drawerIcon: ({ color, size }) => <Ionicons name="cube-outline" size={size} color={color} /> }} />
       <Drawer.Screen
         name="notifications"
         options={{

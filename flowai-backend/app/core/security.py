@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+import secrets
 
 from fastapi import HTTPException, status
 from jose import JWTError, jwt
@@ -15,6 +16,8 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 REFRESH_TOKEN_EXPIRE_DAYS = 7
+VERIFY_EMAIL_EXPIRE_HOURS = 24
+PASSWORD_RESET_EXPIRE_MINUTES = 30
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -25,15 +28,37 @@ def hash_password(password: str) -> str:
     return pwd_context.hash(password)
 
 
+def generate_jti() -> str:
+    """Unique identifier embedded in a signed token so it can be revoked server-side."""
+    return secrets.token_urlsafe(32)
+
+
 def create_access_token(subject: str, expires_delta: timedelta | None = None) -> str:
     expire = datetime.now(timezone.utc) + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     to_encode = {"sub": subject, "exp": expire}
     return jwt.encode(to_encode, settings.APP_NAME, algorithm=ALGORITHM)
 
 
-def create_refresh_token(subject: str, expires_delta: timedelta | None = None) -> str:
+def create_refresh_token(
+    subject: str,
+    jti: str | None = None,
+    expires_delta: timedelta | None = None,
+) -> str:
     expire = datetime.now(timezone.utc) + (expires_delta or timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS))
-    to_encode = {"sub": subject, "type": "refresh", "exp": expire}
+    to_encode: dict = {"sub": subject, "type": "refresh", "exp": expire}
+    if jti:
+        to_encode["jti"] = jti
+    return jwt.encode(to_encode, settings.APP_NAME, algorithm=ALGORITHM)
+
+
+def create_temporary_token(
+    subject: str,
+    token_type: str,
+    expires_delta: timedelta,
+) -> str:
+    """Short-lived single-purpose token used for email verification / password reset."""
+    expire = datetime.now(timezone.utc) + expires_delta
+    to_encode = {"sub": subject, "type": token_type, "exp": expire}
     return jwt.encode(to_encode, settings.APP_NAME, algorithm=ALGORITHM)
 
 

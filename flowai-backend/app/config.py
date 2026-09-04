@@ -29,6 +29,11 @@ class Settings(BaseSettings):
     CELERY_TASK_ALWAYS_EAGER: bool = False
     JOB_MAX_RETRIES: int = 3
 
+    # Website / commerce settings (Phase 2+)
+    PUBLIC_STORE_URL: str = "http://localhost:3000"
+    VERIFY_EMAIL_EXPIRE_HOURS: int = 24
+    PASSWORD_RESET_EXPIRE_MINUTES: int = 30
+
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
     @property

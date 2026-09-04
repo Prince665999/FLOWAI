@@ -34,3 +34,35 @@ def get_current_user(
 
 def get_current_active_user(current_user: User = Depends(get_current_user)) -> User:
     return current_user
+
+
+def require_staff_dep(current_user: User = Depends(get_current_user)) -> User:
+    """FastAPI dependency: only internal staff accounts are allowed."""
+    if not current_user.is_superuser and not current_user.is_staff:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Staff access required")
+    return current_user
+
+
+def require_customer_dep(current_user: User = Depends(get_current_user)) -> User:
+    """FastAPI dependency: only store customer accounts are allowed."""
+    if not current_user.is_superuser and not current_user.is_customer:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Customer access required")
+    return current_user
+
+
+def require_roles(*allowed_roles: str):
+    """Factory producing a dependency that requires any of the given roles."""
+
+    def dependency(current_user: User = Depends(get_current_user)) -> User:
+        if current_user.is_superuser:
+            return current_user
+        if current_user.role_name.lower() not in {str(r).lower() for r in allowed_roles}:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Permission denied")
+        return current_user
+
+    return dependency
+
+
+require_admin_dep = require_roles("admin")
+require_manager_or_admin_dep = require_roles("admin", "manager")
+require_staff_role_dep = require_roles("admin", "manager", "employee")

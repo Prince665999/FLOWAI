@@ -6,10 +6,14 @@ from app.models.user import User
 
 
 class RBAC:
+    CUSTOMER = "customer"
     ADMIN = "admin"
     MANAGER = "manager"
     EMPLOYEE = "employee"
     AI_AGENT = "ai_agent"
+
+    STAFF_ROLES = {EMPLOYEE, MANAGER, ADMIN}
+    MANAGER_ROLES = {MANAGER, ADMIN}
 
     @staticmethod
     def require_roles(user: User, allowed_roles: Iterable[str]) -> None:
@@ -22,6 +26,16 @@ class RBAC:
 
         if user.role_name.lower() not in allowed:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Permission denied")
+
+    @staticmethod
+    def require_staff(user: User) -> None:
+        """Allow only staff accounts (never a store customer)."""
+        if user.is_superuser or user.is_staff:
+            return
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Staff access required",
+        )
 
 
 # Backward-compatible helper for simple checks.
