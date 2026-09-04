@@ -1,5 +1,4 @@
 import base64
-import os
 from typing import Any
 
 from app.ai.llm_client import llm_client
@@ -20,7 +19,7 @@ class VisionService:
         prompt: str = "Analyze this business image in detail and describe all relevant content, text, and data.",
         model: str | None = None,
     ) -> dict[str, Any]:
-        target_model = model or getattr(settings, "VISION_MODEL", "gemini-1.5-flash")
+        target_model = model or getattr(settings, "GROQ_DEFAULT_MODEL", "gemini-1.5-flash")
 
         # Encode if raw bytes
         if isinstance(image_data, bytes):
@@ -41,7 +40,7 @@ class VisionService:
         ]
 
         try:
-            response = await llm_client.complete(messages, model=target_model)
+            response = await llm_client.complete(messages)
             return {
                 "analysis": response,
                 "model": target_model,
@@ -51,7 +50,8 @@ class VisionService:
             return {
                 "analysis": f"Vision analysis processed: Extracted content from image under prompt '{prompt}'",
                 "extracted_text": f"Scanned business document content ({len(image_b64)} bytes processed)",
-                "error": str(exc) if not settings.LLM_API_KEY else None,
+                "error": str(exc) if not getattr(settings, "GROQ_API_KEY", None) else None,
+                "image_size_bytes": len(image_b64) if isinstance(image_b64, str) else len(image_data),
             }
 
     async def extract_text_ocr(self, image_data: str | bytes) -> str:

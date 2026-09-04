@@ -45,7 +45,7 @@ class AnalyticsService:
         ).count()
 
         # Customer records count
-        total_customers = db.query(Customer).filter(Customer.user_id == user.id).count()
+        total_customers = db.query(Customer).count()
 
         success_rate = (
             round((successful_runs / total_workflow_runs) * 100, 1)
