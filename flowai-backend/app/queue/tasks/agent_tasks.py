@@ -10,7 +10,7 @@ from app.queue.celery_app import celery_app
 
 
 @celery_app.task(bind=True, max_retries=3, name="flowai.agent.execute")
-def execute_agent_task(self, job_id: int, run_id: int, agent_id: int | None = None) -> dict:
+def execute_agent_task(self, job_id: int, run_id: int, agent_id: int | None = None, use_multi_agent: bool = False) -> dict:
     db = SessionLocal()
     job = db.query(Job).filter(Job.id == job_id).first()
     run = db.query(AgentRun).filter(AgentRun.id == run_id).first()
@@ -25,7 +25,18 @@ def execute_agent_task(self, job_id: int, run_id: int, agent_id: int | None = No
         run.status = "running"
         run.started_at = datetime.now(timezone.utc)
         db.commit()
-        result = asyncio.run(AgentExecutor().execute(run.objective, user_id=run.user_id, db=db, allowed_tools=allowed_tools))
+
+        # Multi-agent coordination
+        is_multi = use_multi_agent or (agent is None and ("compare" in run.objective.lower() or "research" in run.objective.lower()))
+        result = asyncio.run(
+            AgentExecutor().execute(
+                run.objective,
+                user_id=run.user_id,
+                db=db,
+                allowed_tools=allowed_tools,
+                use_multi_agent_supervisor=is_multi,
+            )
+        )
         run.plan = result["plan"]
         run.steps = result["steps"]
         run.result = result["result"]

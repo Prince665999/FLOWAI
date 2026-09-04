@@ -14,8 +14,18 @@ from app.models.job import Job
 from app.config import settings
 from app.queue.idempotency import build_idempotency_key
 from app.queue.tasks.workflow_tasks import execute_workflow_task
-from app.schemas.workflow import WorkflowCreate, WorkflowDetailRead, WorkflowRead, WorkflowRunCreate, WorkflowRunRead, WorkflowUpdate
+from app.schemas.workflow import (
+    WorkflowCreate,
+    WorkflowDetailRead,
+    WorkflowPublishRequest,
+    WorkflowRead,
+    WorkflowRollbackRequest,
+    WorkflowRunCreate,
+    WorkflowRunRead,
+    WorkflowUpdate,
+)
 from app.workflow_engine.engine import workflow_engine
+from app.workflow_engine.versioning import workflow_versioning
 
 router = APIRouter(prefix="/workflows", tags=["workflows"])
 
@@ -38,7 +48,13 @@ def create_workflow(payload: WorkflowCreate, db: Session = Depends(get_db), user
         workflow_engine.validate(payload.definition.model_dump())
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
-    workflow = Workflow(user_id=user.id, name=payload.name, description=payload.description, definition=payload.definition.model_dump())
+    workflow = Workflow(
+        user_id=user.id,
+        name=payload.name,
+        description=payload.description,
+        definition=payload.definition.model_dump(),
+        status=payload.status,
+    )
     db.add(workflow)
     db.commit()
     db.refresh(workflow)
@@ -58,7 +74,7 @@ def get_workflow(workflow_id: int, db: Session = Depends(get_db), user: User = D
 def update_workflow(workflow_id: int, payload: WorkflowUpdate, db: Session = Depends(get_db), user: User = Depends(get_current_active_user)) -> Workflow:
     workflow = owned_workflow(workflow_id, user, db)
     values = payload.model_dump(exclude_unset=True)
-    if "definition" in values:
+    if "definition" in values and values["definition"] is not None:
         try:
             workflow_engine.validate(values["definition"])
         except ValueError as exc:
@@ -68,6 +84,28 @@ def update_workflow(workflow_id: int, payload: WorkflowUpdate, db: Session = Dep
     db.commit()
     db.refresh(workflow)
     return workflow
+
+
+@router.post("/{workflow_id}/publish", response_model=WorkflowRead)
+def publish_workflow(
+    workflow_id: int,
+    payload: WorkflowPublishRequest,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_active_user),
+) -> Workflow:
+    workflow = owned_workflow(workflow_id, user, db)
+    return workflow_versioning.publish_version(workflow, comment=payload.comment, db=db)
+
+
+@router.post("/{workflow_id}/rollback", response_model=WorkflowRead)
+def rollback_workflow(
+    workflow_id: int,
+    payload: WorkflowRollbackRequest,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_active_user),
+) -> Workflow:
+    workflow = owned_workflow(workflow_id, user, db)
+    return workflow_versioning.rollback_version(workflow, target_version=payload.target_version, db=db)
 
 
 @router.delete("/{workflow_id}", status_code=status.HTTP_204_NO_CONTENT)

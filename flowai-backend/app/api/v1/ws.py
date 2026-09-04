@@ -1,5 +1,4 @@
 import json
-
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from sqlalchemy.orm import Session
 
@@ -59,3 +58,17 @@ async def conversation_websocket(websocket: WebSocket, conversation_id: int) -> 
         connection_manager.disconnect(websocket, conversation_id)
     finally:
         db.close()
+
+
+@router.websocket("/ws/events/{user_id}")
+async def user_events_websocket(websocket: WebSocket, user_id: int) -> None:
+    """User-level real-time events channel for approvals, notifications, and workflow status."""
+    await connection_manager.connect_user(websocket, user_id)
+    try:
+        while True:
+            # Keep connection alive with heartbeat / client pings
+            data = await websocket.receive_text()
+            if data == "ping":
+                await websocket.send_text(json.dumps({"event": "pong"}))
+    except WebSocketDisconnect:
+        connection_manager.disconnect_user(websocket, user_id)

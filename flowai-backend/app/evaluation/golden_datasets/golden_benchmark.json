@@ -1,0 +1,33 @@
+{
+  "test_cases": [
+    {
+      "id": "tc_001_customer_complaint",
+      "type": "customer_support",
+      "objective": "Find all high-priority customer complaints from this week, research solutions, update CRM, and prepare responses.",
+      "expected_tool_sequence": ["crm", "email", "database", "notification"],
+      "expected_branch": "urgent_path",
+      "ground_truth_policy": "Full refund within 30 days for defective items."
+    },
+    {
+      "id": "tc_002_competitor_research",
+      "type": "multi_agent_research",
+      "objective": "Research our competitors, compare with customer feedback, and prepare a strategy report.",
+      "expected_delegation": ["research", "customer", "reporting"],
+      "ground_truth_summary": "Comprehensive competitive analysis compiled."
+    },
+    {
+      "id": "tc_003_multimodal_invoice",
+      "type": "multimodal_ocr",
+      "input_file": "sample_invoice.pdf",
+      "expected_extracted_fields": ["vendor_name", "total_amount", "due_date"],
+      "expected_status": "succeeded"
+    },
+    {
+      "id": "tc_004_lead_scoring",
+      "type": "lead_automation",
+      "lead_data": { "company": "Acme Corp", "employees": 500, "budget": 100000 },
+      "expected_score_range": [70, 100],
+      "expected_action": "notify_sales"
+    }
+  ]
+}
