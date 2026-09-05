@@ -1,5 +1,2 @@
-import ComingSoon from "@/components/layout/ComingSoon";
-
-export default function SearchPage() {
-  return <ComingSoon title="Search" />;
-}
+import Link from "next/link";
+export default function SearchPage(){return <main className="mx-auto max-w-2xl px-6 py-12"><h1 className="text-3xl font-bold">Search products</h1><form action="/products" className="mt-6 flex gap-2"><input name="search" className="flex-1 rounded-md border p-2" placeholder="Laptop, monitor, router..."/><button className="rounded-md bg-brand-500 px-4 text-white">Search</button></form><p className="mt-4 text-sm text-slate-500">Or <Link className="text-brand-600 underline" href="/products">browse all products</Link>.</p></main>}

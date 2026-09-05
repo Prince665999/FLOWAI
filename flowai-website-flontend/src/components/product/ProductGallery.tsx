@@ -1,0 +1,1 @@
+export default function ProductGallery({ imageUrl, name }: { imageUrl?: string | null; name: string }) { return <div className="aspect-square rounded-xl bg-slate-100">{imageUrl ? <img src={imageUrl} alt={name} className="h-full w-full object-cover"/> : <div className="p-8 text-slate-400">Image unavailable</div>}</div>; }
