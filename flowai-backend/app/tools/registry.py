@@ -41,8 +41,13 @@ def register_builtin_tools() -> None:
 	from app.tools.notification_tool import NotificationTool
 	from app.tools.weather_tool import WeatherTool
 	from app.tools.web_search_tool import WebSearchTool
+	from app.tools.product_search_tool import ProductSearchTool
+	from app.tools.order_lookup_tool import OrderLookupTool
+	from app.tools.inventory_check_tool import InventoryCheckTool
+	from app.tools.refund_tool import RefundTool
+	from app.tools.cancellation_tool import CancellationTool
 
-	for tool_class in (CRMTool, EmailTool, CalendarTool, DatabaseTool, FileTool, WebSearchTool, CalculatorTool, WeatherTool, NotificationTool):
+	for tool_class in (CRMTool, EmailTool, CalendarTool, DatabaseTool, FileTool, WebSearchTool, CalculatorTool, WeatherTool, NotificationTool, ProductSearchTool, OrderLookupTool, InventoryCheckTool, RefundTool, CancellationTool):
 		if tool_class.name not in tool_registry.names():
 			tool_registry.register(tool_class())
 

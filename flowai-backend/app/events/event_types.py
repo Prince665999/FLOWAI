@@ -1,0 +1,7 @@
+ORDER_CREATED = "order_created"
+PAYMENT_SUCCEEDED = "payment_succeeded"
+PAYMENT_FAILED = "payment_failed"
+INVENTORY_RESERVED = "inventory_reserved"
+INVENTORY_LOW = "inventory_low"
+ORDER_SHIPPED = "order_shipped"
+SUPPORT_TICKET_CREATED = "support_ticket_created"

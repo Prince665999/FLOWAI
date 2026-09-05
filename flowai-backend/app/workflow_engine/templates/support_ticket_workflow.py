@@ -1,0 +1,2 @@
+def template() -> dict:
+ return {"name":"Support ticket workflow","definition":{"nodes":[{"id":"trigger","type":"trigger","config":{}},{"id":"classify","type":"ai","config":{"prompt":"Classify support issue"}},{"id":"sensitive","type":"condition","config":{"field":"sensitive_action","operator":"equals","value":True,"true_target":"approval","false_target":"notify"}},{"id":"approval","type":"approval","config":{}},{"id":"notify","type":"notification","config":{}}],"edges":[{"source":"trigger","target":"classify"},{"source":"classify","target":"sensitive"}]}}

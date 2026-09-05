@@ -42,7 +42,7 @@ def create_schedule(
     schedule = Schedule(
         user_id=user.id,
         workflow_id=payload.workflow_id,
-        name=payload.name,
+        name=payload.name or f"{workflow.name} schedule",
         description=payload.description,
         cron_expression=payload.cron_expression,
         timezone=payload.timezone,

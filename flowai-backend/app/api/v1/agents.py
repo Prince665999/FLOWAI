@@ -12,6 +12,7 @@ from app.models.job import Job
 from app.models.user import User
 from app.queue.idempotency import build_idempotency_key
 from app.queue.tasks.agent_tasks import execute_agent_task
+from app.agents.executor import AgentExecutor
 from app.schemas.agent import AgentCreate, AgentRead, AgentRunCreate, AgentRunRead
 from app.schemas.tool import ToolCallRead, ToolDefinition, ToolInvokeRequest
 from app.tools.base_tool import ToolContext

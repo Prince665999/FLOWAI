@@ -19,6 +19,14 @@ from app.models.product import Product  # noqa: F401
 from app.models.product_category import ProductCategory  # noqa: F401
 from app.models.inventory import Inventory  # noqa: F401
 from app.models.inventory_history import InventoryHistory  # noqa: F401
+from app.models.cart import Cart  # noqa: F401
+from app.models.cart_item import CartItem  # noqa: F401
+from app.models.order import Order  # noqa: F401
+from app.models.order_item import OrderItem  # noqa: F401
+from app.models.payment import Payment  # noqa: F401
+from app.models.domain_event import DomainEvent  # noqa: F401
+from app.models.support_ticket import SupportTicket  # noqa: F401
+from app.models.product_review import ProductReview  # noqa: F401
 from app.models.role import Role  # noqa: F401
 from app.models.schedule import Schedule  # noqa: F401
 from app.models.token import Token  # noqa: F401

@@ -4,7 +4,9 @@ from pydantic import BaseModel, ConfigDict, Field
 
 class ScheduleCreate(BaseModel):
     workflow_id: int
-    name: str = Field(min_length=1, max_length=255)
+    # Keep compatibility with existing clients that only supplied a workflow
+    # and cron expression; the route derives a name when one is omitted.
+    name: str | None = Field(default=None, min_length=1, max_length=255)
     description: str | None = None
     cron_expression: str = Field(default="0 8 * * *", min_length=5, max_length=100)
     timezone: str = "UTC"
