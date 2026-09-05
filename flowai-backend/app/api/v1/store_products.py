@@ -75,6 +75,14 @@ def list_store_products(
 	return PublicProductPage(items=[_to_public_product(product, available) for product, available in rows], page=page, page_size=page_size, total=total, total_pages=ceil(total / page_size) if total else 0)
 
 
+@router.get("/slug/{slug}", response_model=PublicProductRead)
+def get_store_product_by_slug(slug: str, db: Session = Depends(get_db)) -> PublicProductRead:
+	row = _product_query(db).filter(Product.slug == slug).first()
+	if row is None:
+		raise HTTPException(status_code=404, detail="Product not found")
+	return _to_public_product(*row)
+
+
 @router.get("/{product_id}", response_model=PublicProductRead)
 def get_store_product(product_id: int, db: Session = Depends(get_db)) -> PublicProductRead:
 	row = _product_query(db).filter(Product.id == product_id).first()

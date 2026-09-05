@@ -18,9 +18,24 @@ class CartService:
             raise HTTPException(409, "Product is unavailable in the requested quantity")
         return product
     def view(self, db: Session, user_id: int) -> dict:
-        cart=self.active(db,user_id); items=[]; subtotal=0
+        cart = self.active(db, user_id)
+        items = []
+        subtotal = 0
         for item in db.query(CartItem).filter_by(cart_id=cart.id):
-            product=self.validate(db,item.product_id,item.quantity); total=product.price_amount*item.quantity; subtotal += total
-            items.append({"id":item.id,"product_id":item.product_id,"quantity":item.quantity,"unit_price_amount":product.price_amount,"line_total_amount":total})
-        return {"id":cart.id,"status":cart.status,"items":items,"subtotal_amount":subtotal,"currency":"USD"}
+            product = db.query(Product).filter_by(id=item.product_id).first()
+            if product is None:
+                continue
+            total = product.price_amount * item.quantity
+            subtotal += total
+            items.append({
+                "id": item.id,
+                "product_id": item.product_id,
+                "quantity": item.quantity,
+                "unit_price_amount": product.price_amount,
+                "line_total_amount": total,
+                "name": product.name,
+                "slug": product.slug,
+                "image_url": product.image_url,
+            })
+        return {"id": cart.id, "status": cart.status, "items": items, "subtotal_amount": subtotal, "currency": "USD"}
 cart_service=CartService()

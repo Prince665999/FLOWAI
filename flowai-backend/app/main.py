@@ -5,6 +5,7 @@ from app.api.v1.router import api_router
 from app.api.v1.ws import router as websocket_router
 from app.config import settings
 from app.db.init_db import init_db
+from app.events import handlers as _event_handlers  # noqa: F401 — register subscribers
 
 app = FastAPI(
     title=settings.APP_NAME,

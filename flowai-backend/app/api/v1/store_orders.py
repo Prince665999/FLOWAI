@@ -14,3 +14,9 @@ def order(order_id:int,db:Session=Depends(get_db),user:User=Depends(require_cust
     found=db.query(Order).filter_by(id=order_id,user_id=user.id).first()
     if not found: raise HTTPException(404,"Order not found")
     return order_service.serialize(db,found)
+
+@router.post("/{order_id}/cancel",response_model=OrderRead)
+def cancel_order(order_id:int,db:Session=Depends(get_db),user:User=Depends(require_customer_dep)):
+    found=db.query(Order).filter_by(id=order_id,user_id=user.id).first()
+    if not found: raise HTTPException(404,"Order not found")
+    return order_service.serialize(db, order_service.cancel(db, found, user.id))

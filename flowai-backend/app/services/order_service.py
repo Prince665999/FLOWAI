@@ -40,4 +40,28 @@ class OrderService:
         event_bus.publish(db,event_type=ORDER_CREATED,aggregate_type="order",aggregate_id=str(order.id),idempotency_key=f"order-created:{order.id}",payload={"order_id":order.id,"user_id":user_id})
         event_bus.publish(db,event_type=INVENTORY_RESERVED,aggregate_type="order",aggregate_id=str(order.id),idempotency_key=f"inventory-reserved:{order.id}",payload={"order_id":order.id})
         db.commit(); db.refresh(order); return order
+
+    def cancel(self, db: Session, order: Order, user_id: int) -> Order:
+        if order.status in {"cancelled", "delivered", "fulfilled", "shipped"}:
+            raise HTTPException(409, "This order can no longer be cancelled")
+        items = db.query(OrderItem).filter_by(order_id=order.id).all()
+        for item in items:
+            inv = db.query(Inventory).filter_by(product_id=item.product_id).with_for_update().first()
+            if inv:
+                inv.quantity_reserved = max(0, inv.quantity_reserved - item.quantity)
+                db.add(InventoryHistory(
+                    product_id=item.product_id,
+                    quantity_delta=0,
+                    quantity_on_hand=inv.quantity_on_hand,
+                    quantity_reserved=inv.quantity_reserved,
+                    reason=f"Released reservation for cancelled {order.order_number}",
+                    user_id=user_id,
+                ))
+        order.status = "cancelled"
+        order.fulfillment_status = "cancelled"
+        if order.payment_status == "unpaid":
+            order.payment_status = "cancelled"
+        db.commit()
+        db.refresh(order)
+        return order
 order_service=OrderService()

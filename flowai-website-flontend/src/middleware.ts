@@ -2,13 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { ACCESS_COOKIE } from "./lib/cookies";
 
-// Routes that every authenticated customer must be signed in to reach.
-const PROTECTED_PREFIXES = ["/(customer)"];
+const PROTECTED_PREFIXES = ["/cart", "/checkout", "/account", "/support", "/assistant"];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-
-  const needsAuth = PROTECTED_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+  const needsAuth = PROTECTED_PREFIXES.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+  );
   if (!needsAuth) {
     return NextResponse.next();
   }

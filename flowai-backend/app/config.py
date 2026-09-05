@@ -33,6 +33,16 @@ class Settings(BaseSettings):
     PUBLIC_STORE_URL: str = "http://localhost:3000"
     VERIFY_EMAIL_EXPIRE_HOURS: int = 24
     PASSWORD_RESET_EXPIRE_MINUTES: int = 30
+    PAYMENT_PROVIDER: str = "test"
+    STRIPE_SECRET_KEY: str | None = None
+    STRIPE_WEBHOOK_SECRET: str | None = None
+    WEBHOOK_SECRET: str | None = None
+    SMTP_HOST: str | None = None
+    SMTP_PORT: int = 587
+    SMTP_USERNAME: str | None = None
+    SMTP_PASSWORD: str | None = None
+    SMTP_FROM: str = "FLOWAI Store <noreply@localhost>"
+    SMTP_STARTTLS: bool = True
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

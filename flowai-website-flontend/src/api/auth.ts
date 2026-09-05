@@ -36,19 +36,20 @@ export async function refreshSession(): Promise<AuthResult> {
 
 export async function getMe(): Promise<User | null> {
   try {
-    return await apiClient.get<User>(`${AUTH_PATH}/me`);
+    const payload = await apiClient.get<{ ok: boolean; user?: User }>(`${AUTH_PATH}/me`);
+    return payload.user ?? null;
   } catch {
     return null;
   }
 }
 
 export async function forgotPassword(email: string): Promise<AuthResult> {
-  return toAuthResult(apiClient.post(`${AUTH_PATH}/password-reset/request`, { email }));
+  return toAuthResult(apiClient.post(`${AUTH_PATH}/forgot-password`, { email }));
 }
 
 export async function resetPassword(token: string, newPassword: string): Promise<AuthResult> {
   return toAuthResult(
-    apiClient.post(`${AUTH_PATH}/password-reset/confirm`, {
+    apiClient.post(`${AUTH_PATH}/reset-password`, {
       token,
       new_password: newPassword,
     }),

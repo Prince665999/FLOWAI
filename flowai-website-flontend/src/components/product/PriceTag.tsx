@@ -1,2 +1,13 @@
 import { formatMoney } from "@/lib/formatters";
-export default function PriceTag({ amount, currency }: { amount: number; currency: string }) { return <span className="text-lg font-bold text-slate-900">{formatMoney(amount, currency)}</span>; }
+
+export default function PriceTag({
+  amount,
+  currency,
+  className = "",
+}: {
+  amount: number;
+  currency: string;
+  className?: string;
+}) {
+  return <span className={`font-semibold text-slate-900 ${className}`}>{formatMoney(amount, currency)}</span>;
+}

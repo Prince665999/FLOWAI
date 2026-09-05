@@ -33,6 +33,25 @@ class InventoryService:
 		audit_service.log_event(db, action="inventory_adjusted", resource_type="inventory", resource_id=product_id, user_id=user_id, details={"quantity_delta": payload.quantity_delta, "reason": payload.reason})
 		return inventory
 
+	def reserve(self, db: Session, product_id: int, quantity: int, user_id: int, reason: str) -> Inventory:
+		inventory = db.query(Inventory).filter_by(product_id=product_id).with_for_update().first()
+		if inventory is None:
+			raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Inventory record missing")
+		available = inventory.quantity_on_hand - inventory.quantity_reserved
+		if available < quantity:
+			raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Insufficient inventory")
+		inventory.quantity_reserved += quantity
+		db.add(InventoryHistory(product_id=product_id, quantity_delta=0, quantity_on_hand=inventory.quantity_on_hand, quantity_reserved=inventory.quantity_reserved, reason=reason, user_id=user_id))
+		return inventory
+
+	def release(self, db: Session, product_id: int, quantity: int, user_id: int, reason: str) -> Inventory:
+		inventory = db.query(Inventory).filter_by(product_id=product_id).with_for_update().first()
+		if inventory is None:
+			raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Inventory record missing")
+		inventory.quantity_reserved = max(0, inventory.quantity_reserved - quantity)
+		db.add(InventoryHistory(product_id=product_id, quantity_delta=0, quantity_on_hand=inventory.quantity_on_hand, quantity_reserved=inventory.quantity_reserved, reason=reason, user_id=user_id))
+		return inventory
+
 	@staticmethod
 	def to_read(inventory: Inventory) -> dict:
 		return {"id": inventory.id, "product_id": inventory.product_id, "quantity_on_hand": inventory.quantity_on_hand, "quantity_reserved": inventory.quantity_reserved, "reorder_level": inventory.reorder_level, "available_quantity": max(0, inventory.quantity_on_hand - inventory.quantity_reserved), "updated_at": inventory.updated_at}

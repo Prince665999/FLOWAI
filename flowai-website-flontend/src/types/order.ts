@@ -1,1 +1,24 @@
-export interface OrderItem { id:number; product_id:number; sku:string; product_name:string; quantity:number; unit_price_amount:number; line_total_amount:number }; export interface Order { id:number; order_number:string; status:string; payment_status:string; fulfillment_status:string; subtotal_amount:number; tax_amount:number; shipping_amount:number; total_amount:number; currency:string; items:OrderItem[]; created_at:string }
+export interface OrderItem {
+  id: number;
+  product_id: number;
+  sku: string;
+  product_name: string;
+  quantity: number;
+  unit_price_amount: number;
+  line_total_amount: number;
+}
+
+export interface Order {
+  id: number;
+  order_number: string;
+  status: string;
+  payment_status: string;
+  fulfillment_status: string;
+  subtotal_amount: number;
+  tax_amount: number;
+  shipping_amount: number;
+  total_amount: number;
+  currency: string;
+  items: OrderItem[];
+  created_at: string;
+}

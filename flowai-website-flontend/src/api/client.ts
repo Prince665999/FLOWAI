@@ -23,10 +23,20 @@ function toQueryString(params?: Record<string, QueryValue>): string {
   if (!params) return "";
   const search = new URLSearchParams();
   for (const [key, value] of Object.entries(params)) {
-    if (value !== null && value !== undefined) search.set(key, String(value));
+    if (value !== null && value !== undefined && value !== "") search.set(key, String(value));
   }
   const query = search.toString();
   return query ? `?${query}` : "";
+}
+
+function readDetail(payload: unknown, fallback: string) {
+  if (typeof payload === "string" && payload) return payload;
+  if (payload && typeof payload === "object" && "detail" in payload) {
+    const detail = (payload as { detail: unknown }).detail;
+    if (typeof detail === "string") return detail;
+    if (Array.isArray(detail)) return detail.map((item) => JSON.stringify(item)).join(", ");
+  }
+  return fallback;
 }
 
 export async function apiRequest<T = unknown>(path: string, options: RequestOptions = {}): Promise<T> {
@@ -39,17 +49,26 @@ export async function apiRequest<T = unknown>(path: string, options: RequestOpti
   });
   if (response.status === 204) return undefined as T;
   const contentType = response.headers.get("content-type") ?? "";
-  const payload = contentType.includes("application/json") ? await response.json() : await response.text();
-  if (!response.ok) throw new ApiError(response.status, payload);
+  const payload = contentType.includes("application/json")
+    ? await response.json()
+    : await response.text();
+  if (!response.ok) {
+    throw new ApiError(response.status, readDetail(payload, `Request failed (${response.status})`));
+  }
   return payload as T;
 }
 
 export const apiClient = {
-  get: <T = unknown>(path: string, options?: RequestOptions) => apiRequest<T>(path, { ...options, method: "GET" }),
-  post: <T = unknown>(path: string, body?: unknown, options?: RequestOptions) => apiRequest<T>(path, { ...options, method: "POST", body }),
-  put: <T = unknown>(path: string, body?: unknown, options?: RequestOptions) => apiRequest<T>(path, { ...options, method: "PUT", body }),
-  patch: <T = unknown>(path: string, body?: unknown, options?: RequestOptions) => apiRequest<T>(path, { ...options, method: "PATCH", body }),
-  del: <T = unknown>(path: string, options?: RequestOptions) => apiRequest<T>(path, { ...options, method: "DELETE" }),
+  get: <T = unknown>(path: string, options?: RequestOptions) =>
+    apiRequest<T>(path, { ...options, method: "GET" }),
+  post: <T = unknown>(path: string, body?: unknown, options?: RequestOptions) =>
+    apiRequest<T>(path, { ...options, method: "POST", body }),
+  put: <T = unknown>(path: string, body?: unknown, options?: RequestOptions) =>
+    apiRequest<T>(path, { ...options, method: "PUT", body }),
+  patch: <T = unknown>(path: string, body?: unknown, options?: RequestOptions) =>
+    apiRequest<T>(path, { ...options, method: "PATCH", body }),
+  del: <T = unknown>(path: string, options?: RequestOptions) =>
+    apiRequest<T>(path, { ...options, method: "DELETE" }),
 };
 
 export const AUTH_PATH = "/api/auth";

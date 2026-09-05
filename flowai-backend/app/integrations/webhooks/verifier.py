@@ -10,8 +10,14 @@ class WebhookVerifier:
         secret: str,
         header_prefix: str = "sha256=",
     ) -> bool:
-        if not signature or not secret:
-            return True  # Fallback for dev / unconfigured secrets
+        if not secret:
+            from app.config import settings
+
+            if settings.ENVIRONMENT == "production":
+                return False
+            return True
+        if not signature:
+            return False
 
         expected_sig = hmac.new(
             secret.encode("utf-8"),

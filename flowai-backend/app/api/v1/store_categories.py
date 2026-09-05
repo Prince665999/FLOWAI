@@ -15,6 +15,14 @@ def list_store_categories(db: Session = Depends(get_db)) -> list[ProductCategory
 	return db.query(ProductCategory).filter(ProductCategory.is_active.is_(True)).order_by(ProductCategory.name).all()
 
 
+@router.get("/slug/{slug}", response_model=PublicCategoryRead)
+def get_store_category_by_slug(slug: str, db: Session = Depends(get_db)) -> ProductCategory:
+	category = db.query(ProductCategory).filter(ProductCategory.slug == slug, ProductCategory.is_active.is_(True)).first()
+	if category is None:
+		raise HTTPException(status_code=404, detail="Category not found")
+	return category
+
+
 @router.get("/{category_id}/products", response_model=PublicProductPage)
 def list_category_products(
 	category_id: int,
