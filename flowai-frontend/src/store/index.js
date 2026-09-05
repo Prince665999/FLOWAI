@@ -1,0 +1,1 @@
+import { configureStore } from "@reduxjs/toolkit";import auth from "./authSlice";import workflows from "./workflowSlice";import analytics from "./analyticsSlice";export const store=configureStore({reducer:{auth,workflows,analytics}});

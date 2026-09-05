@@ -1,0 +1,2 @@
+import { Pressable, Text, View } from "react-native";
+export default function TicketQueue({ tickets=[], onSelect }) { return <View>{tickets.map(ticket=><Pressable key={ticket.id} onPress={()=>onSelect(ticket)} style={{padding:14,borderBottomWidth:1,borderColor:"#e2e8f0"}}><Text style={{fontWeight:"700"}}>{ticket.subject}</Text><Text>{ticket.status} · {ticket.priority}</Text></Pressable>)}</View>; }

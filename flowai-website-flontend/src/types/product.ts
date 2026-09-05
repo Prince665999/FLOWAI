@@ -1,0 +1,1 @@
+export interface Product { id:number; sku:string; name:string; slug:string; description?:string|null; short_description?:string|null; brand?:string|null; price_amount:number; currency:string; image_url?:string|null; specifications:Record<string,unknown>; available_quantity:number }

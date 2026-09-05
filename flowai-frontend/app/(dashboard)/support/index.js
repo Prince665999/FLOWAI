@@ -1,0 +1,2 @@
+import { useEffect,useState } from "react";import { ActivityIndicator,View } from "react-native";import { router } from "expo-router";import { listTickets } from "../../../src/api/support";import TicketQueue from "../../../src/components/support/TicketQueue";
+export default function SupportScreen(){const [tickets,setTickets]=useState();useEffect(()=>{listTickets().then(setTickets);},[]);return <View style={{padding:16}}>{tickets?<TicketQueue tickets={tickets} onSelect={x=>router.push(`/(dashboard)/support/${x.id}`)}/>:<ActivityIndicator/>}</View>}

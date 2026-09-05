@@ -1,0 +1,1 @@
+export function createAuthenticatedSocket(path,token){const base=(process.env.EXPO_PUBLIC_WS_BASE_URL||"ws://localhost:8000").replace(/\/$/,"");return new WebSocket(`${base}${path}${token?`?token=${encodeURIComponent(token)}`:""}`);}

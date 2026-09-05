@@ -1,0 +1,2 @@
+import { useEffect,useState } from "react";import { ActivityIndicator,View } from "react-native";import { useLocalSearchParams } from "expo-router";import { getTicket } from "../../../src/api/support";import TicketDetail from "../../../src/components/support/TicketDetail";
+export default function TicketScreen(){const {ticketId}=useLocalSearchParams(),[ticket,setTicket]=useState();useEffect(()=>{getTicket(ticketId).then(setTicket);},[ticketId]);return <View>{ticket?<TicketDetail ticket={ticket}/>:<ActivityIndicator/>}</View>}

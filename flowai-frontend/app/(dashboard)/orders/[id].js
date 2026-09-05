@@ -1,0 +1,2 @@
+import { useEffect,useState } from "react";import { ActivityIndicator,View } from "react-native";import { useLocalSearchParams } from "expo-router";import { getOrder } from "../../../src/api/orders";import OrderDetailCard from "../../../src/components/orders/OrderDetailCard";
+export default function OrderScreen(){const {id}=useLocalSearchParams(),[order,setOrder]=useState();useEffect(()=>{getOrder(id).then(setOrder);},[id]);return <View style={{padding:16}}>{order?<OrderDetailCard order={order}/>:<ActivityIndicator/>}</View>}

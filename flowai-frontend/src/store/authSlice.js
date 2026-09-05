@@ -1,0 +1,1 @@
+import { createSlice } from "@reduxjs/toolkit";export default createSlice({name:"auth",initialState:{user:null,loading:true},reducers:{setUser:(s,a)=>{s.user=a.payload;s.loading=false},clearUser:(s)=>{s.user=null;s.loading=false}}}).reducer;

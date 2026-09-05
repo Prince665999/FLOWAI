@@ -1,0 +1,1 @@
+export const formatMoney=(amount:number,currency="USD")=>new Intl.NumberFormat("en-US",{style:"currency",currency}).format(amount/100); export const formatDate=(value:string)=>new Date(value).toLocaleString();

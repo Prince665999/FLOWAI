@@ -1,0 +1,1 @@
+import { z } from "zod"; export const addressSchema=z.object({full_name:z.string().min(2),line1:z.string().min(2),city:z.string().min(2),country:z.string().length(2),postal_code:z.string().optional()}); export type AddressInput=z.infer<typeof addressSchema>;
