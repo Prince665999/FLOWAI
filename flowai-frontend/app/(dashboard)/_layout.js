@@ -96,7 +96,14 @@ export default function DashboardLayout() {
         }}
       />
       <Drawer.Screen name="products" options={{ title: "Products", drawerLabel: "Products", drawerIcon: ({ color, size }) => <Ionicons name="pricetags-outline" size={size} color={color} /> }} />
+      <Drawer.Screen name="products/new" options={{ title: "New Product", drawerLabel: "New Product", drawerIcon: ({ color, size }) => <Ionicons name="add-circle-outline" size={size} color={color} /> }} />
+      <Drawer.Screen name="products/[id]" options={{ drawerItemStyle: { display: "none" } }} />
       <Drawer.Screen name="inventory" options={{ title: "Inventory", drawerLabel: "Inventory", drawerIcon: ({ color, size }) => <Ionicons name="cube-outline" size={size} color={color} /> }} />
+      <Drawer.Screen name="inventory/[productId]" options={{ drawerItemStyle: { display: "none" } }} />
+      <Drawer.Screen name="orders" options={{ title: "Orders", drawerLabel: "Orders", drawerIcon: ({ color, size }) => <Ionicons name="receipt-outline" size={size} color={color} /> }} />
+      <Drawer.Screen name="orders/[id]" options={{ drawerItemStyle: { display: "none" } }} />
+      <Drawer.Screen name="support" options={{ title: "Customer Support", drawerLabel: "Customer Support", drawerIcon: ({ color, size }) => <Ionicons name="help-buoy-outline" size={size} color={color} /> }} />
+      <Drawer.Screen name="support/[ticketId]" options={{ drawerItemStyle: { display: "none" } }} />
       <Drawer.Screen
         name="notifications"
         options={{

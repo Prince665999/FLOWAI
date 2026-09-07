@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from sqlalchemy.orm import Session
 
 from app.ai.rag.chroma_store import chroma_store
+from app.config import settings
 from app.db.session import get_db
 from app.dependencies import get_current_active_user
 from app.models.document import Document
@@ -61,11 +62,17 @@ async def upload_document(
         db.commit()
         db.refresh(job)
         try:
-            task_result = index_document_task.apply_async(args=[job.id, document.id])
-            job.task_id = task_result.id
-            db.commit()
+            if settings.QUEUE_ENABLED and settings.DOCUMENT_INDEX_ASYNC:
+                task_result = index_document_task.apply_async(args=[job.id, document.id])
+                job.task_id = task_result.id
+                db.commit()
+            else:
+                index_document_task.run(job.id, document.id)
         except Exception:
-            index_document_task.run(job.id, document.id)
+            if settings.QUEUE_ENABLED and settings.DOCUMENT_INDEX_ASYNC:
+                index_document_task.run(job.id, document.id)
+            else:
+                raise
         return document
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc

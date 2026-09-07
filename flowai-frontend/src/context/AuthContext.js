@@ -37,7 +37,11 @@ export function AuthProvider({ children }) {
   const login = async (accessToken, refreshToken, userData) => {
     await saveAuthTokens(accessToken, refreshToken);
     setToken(accessToken);
-    setUser(userData);
+    try {
+      setUser(await getCurrentUser(accessToken));
+    } catch {
+      setUser(userData || null);
+    }
   };
 
   const logout = async () => {

@@ -1,4 +1,5 @@
 import CitationChip from "./CitationChip";
+import { formatAiResponse } from "@/lib/format-ai";
 
 function extractCitations(content: string) {
   return [...content.matchAll(/\[Source: ([^\]]+)\]/g)].map((match) => match[1]);
@@ -20,7 +21,7 @@ export default function MessageBubble({
           mine ? "bg-brand-600 text-white" : "bg-white text-slate-800 shadow-sm ring-1 ring-slate-200"
         }`}
       >
-        <p className="whitespace-pre-wrap">{content}</p>
+        <p className="whitespace-pre-wrap">{mine ? content : formatAiResponse(content)}</p>
         {citations.length ? (
           <div className="mt-2">
             {citations.map((citation) => (

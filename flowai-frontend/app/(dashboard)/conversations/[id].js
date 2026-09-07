@@ -37,7 +37,7 @@ export default function ConversationDetailScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <Stack.Screen options={{ title: "FLOWAI Assistant", headerShown: true }} />
-      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === "ios" ? "padding" : undefined} keyboardVerticalOffset={88}>
+      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={88}>
         <View style={styles.intro}><Text style={styles.title}>Business assistant</Text><Text style={styles.subtitle}>Ask about your operations, customers, or next task.</Text></View>
         <FlatList data={messages} keyExtractor={(item, index) => String(item.id || index)} contentContainerStyle={styles.messages} renderItem={({ item }) => <MessageBubble message={item} />} ListEmptyComponent={<Text style={styles.empty}>Your conversation will appear here.</Text>} />
         <StreamingIndicator visible={sending} />

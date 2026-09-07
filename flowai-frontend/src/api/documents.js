@@ -1,4 +1,5 @@
 import { API_BASE_URL, apiRequest } from "./client";
+import { File, UploadType } from "expo-file-system";
 
 function authHeaders(token) {
 	return { Authorization: `Bearer ${token}` };
@@ -9,21 +10,25 @@ export function listDocuments(token) {
 }
 
 export async function uploadDocument(token, asset) {
-	const formData = new FormData();
-	formData.append("file", {
-		uri: asset.uri,
-		name: asset.name || "document",
-		type: asset.mimeType || "application/octet-stream",
-	});
+	const result = await new File(asset.uri).upload(
+		`${API_BASE_URL}/api/v1/documents`,
+		{
+			httpMethod: "POST",
+			uploadType: UploadType.MULTIPART,
+			fieldName: "file",
+			mimeType: asset.mimeType || "application/octet-stream",
+			headers: authHeaders(token),
+		}
+	);
 
-	const response = await fetch(`${API_BASE_URL}/api/v1/documents`, {
-		method: "POST",
-		headers: authHeaders(token),
-		body: formData,
-	});
-
-	if (!response.ok) {
-		throw new Error((await response.text()) || "Unable to upload document");
+	let payload;
+	try {
+		payload = JSON.parse(result.body);
+	} catch {
+		payload = null;
 	}
-	return response.json();
+	if (result.status < 200 || result.status >= 300) {
+		throw new Error(payload?.detail || result.body || "Unable to upload document");
+	}
+	return payload;
 }

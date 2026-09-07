@@ -27,6 +27,7 @@ class Settings(BaseSettings):
     EMBEDDING_DIMENSIONS: int = 384
     QUEUE_ENABLED: bool = True
     CELERY_TASK_ALWAYS_EAGER: bool = False
+    DOCUMENT_INDEX_ASYNC: bool = False
     JOB_MAX_RETRIES: int = 3
 
     # Website / commerce settings (Phase 2+)

@@ -25,6 +25,7 @@ from app.api.v1.store_checkout import router as store_checkout_router
 from app.api.v1.store_orders import router as store_orders_router
 from app.api.v1.store_payments import router as store_payments_router
 from app.api.v1.customer_support import router as customer_support_router
+from app.api.v1.admin_support import router as admin_support_router
 from app.api.v1.admin_orders import router as admin_orders_router
 from app.api.v1.customer_conversations import router as customer_conversations_router
 from app.api.v1.webhooks import router as webhooks_router
@@ -56,6 +57,7 @@ api_router.include_router(store_checkout_router, prefix="/api/v1")
 api_router.include_router(store_orders_router, prefix="/api/v1")
 api_router.include_router(store_payments_router, prefix="/api/v1")
 api_router.include_router(customer_support_router, prefix="/api/v1")
+api_router.include_router(admin_support_router, prefix="/api/v1")
 api_router.include_router(admin_orders_router, prefix="/api/v1")
 api_router.include_router(customer_conversations_router, prefix="/api/v1")
 api_router.include_router(webhooks_router, prefix="/api/v1")
