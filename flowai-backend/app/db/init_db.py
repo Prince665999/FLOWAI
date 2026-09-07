@@ -1,3 +1,5 @@
+from sqlalchemy import inspect, text
+
 from app.db.base import Base
 from app.db.session import engine
 
@@ -42,7 +44,41 @@ from app.models.workflow_step import WorkflowStep  # noqa: F401
 
 def init_db() -> None:
     Base.metadata.create_all(bind=engine)
+    _ensure_sqlite_schema()
     _seed_development_catalog()
+
+
+def _ensure_sqlite_schema() -> None:
+    """Add columns that create_all will not attach to existing SQLite tables."""
+    if engine.dialect.name != "sqlite":
+        return
+
+    inspector = inspect(engine)
+    tables = set(inspector.get_table_names())
+    with engine.begin() as conn:
+        if "users" in tables:
+            user_cols = {column["name"] for column in inspector.get_columns("users")}
+            if "account_type" not in user_cols:
+                conn.execute(
+                    text(
+                        "ALTER TABLE users ADD COLUMN account_type VARCHAR(20) NOT NULL DEFAULT 'staff'"
+                    )
+                )
+                conn.execute(
+                    text("UPDATE users SET account_type = 'customer' WHERE role_name = 'customer'")
+                )
+                conn.execute(
+                    text("CREATE INDEX IF NOT EXISTS ix_users_account_type ON users (account_type)")
+                )
+            if "email_verified_at" not in user_cols:
+                conn.execute(text("ALTER TABLE users ADD COLUMN email_verified_at DATETIME"))
+        if "customers" in tables:
+            customer_cols = {column["name"] for column in inspector.get_columns("customers")}
+            if "user_id" not in customer_cols:
+                conn.execute(text("ALTER TABLE customers ADD COLUMN user_id INTEGER"))
+                conn.execute(
+                    text("CREATE INDEX IF NOT EXISTS ix_customers_user_id ON customers (user_id)")
+                )
 
 
 def _seed_development_catalog() -> None:
