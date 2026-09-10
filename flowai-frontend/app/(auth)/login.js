@@ -8,9 +8,10 @@ import { useAuth } from "../../src/hooks/useAuth";
 
 export default function LoginScreen() {
   const { login } = useAuth();
-  const [email, setEmail] = useState("admin@example.com");
-  const [password, setPassword] = useState("password123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const canSubmit = email.trim().length > 0 && password.trim().length > 0;
 
   const handleLogin = async () => {
     try {
@@ -50,7 +51,7 @@ export default function LoginScreen() {
           secureTextEntry
         />
 
-        <Button title={loading ? "Signing in..." : "Login"} onPress={handleLogin} disabled={loading} />
+        <Button title={loading ? "Signing in..." : "Login"} onPress={handleLogin} disabled={loading || !canSubmit} />
 
         <Link href="/(auth)/register" asChild>
           <Text style={styles.link}>Need an account? Register</Text>

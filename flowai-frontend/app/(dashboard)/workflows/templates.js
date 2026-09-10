@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -6,114 +6,43 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
-import { createWorkflow } from '../../../src/api/workflows';
+import { createWorkflow, listWorkflowTemplates } from '../../../src/api/workflows';
+import { getAccessToken } from '../../../src/utils/storage';
 import { theme } from '../../../src/theme';
-
-const TEMPLATES = [
-  {
-    id: 'customer_support',
-    name: 'Customer Support Automation',
-    tag: 'CRM & EMAIL',
-    description:
-      'Inbound Email -> AI Intent & Urgency Classification -> Search CRM & Knowledge Base -> Branch on Urgency -> Human Approval -> Send Response.',
-    nodesCount: 6,
-    icon: '💬',
-    definition: {
-      nodes: [
-        { id: 'trigger', type: 'trigger', label: 'New Customer Email', config: { event: 'email_received' } },
-        { id: 'ai_classify', type: 'ai', label: 'Classify Urgency & Sentiment', config: { prompt: 'Classify email urgency and extract customer inquiry' } },
-        { id: 'tool_crm', type: 'tool', label: 'Lookup Customer CRM Record', config: { tool_name: 'crm', action: 'find' } },
-        { id: 'condition_urgency', type: 'condition', label: 'Urgent vs Normal', config: { field: 'urgency', operator: 'equals', value: 'high', then_branch: 'urgent', else_branch: 'normal' } },
-        { id: 'approval_gate', type: 'approval', label: 'Manager Review', config: { message: 'Review drafted support response before sending' } },
-        { id: 'notify_completion', type: 'notification', label: 'Dispatch Notification', config: { channel: 'push', message: 'Inquiry resolved' } },
-      ],
-      edges: [
-        { source: 'trigger', target: 'ai_classify' },
-        { source: 'ai_classify', target: 'tool_crm' },
-        { source: 'tool_crm', target: 'condition_urgency' },
-        { source: 'condition_urgency', target: 'approval_gate', condition: 'urgent' },
-        { source: 'approval_gate', target: 'notify_completion' },
-      ],
-    },
-  },
-  {
-    id: 'daily_sales_report',
-    name: 'Daily Sales & Executive Summary',
-    tag: 'ANALYTICS',
-    description:
-      'Scheduled 8:00 AM Trigger -> Query Sales Database -> Run AI Analytics -> Generate Executive Report -> Notify Management.',
-    nodesCount: 5,
-    icon: '📊',
-    definition: {
-      nodes: [
-        { id: 'trigger', type: 'trigger', label: 'Schedule 8:00 AM Daily', config: { event: 'cron_schedule' } },
-        { id: 'tool_db', type: 'tool', label: 'Query Sales Metrics', config: { tool_name: 'database', action: 'query' } },
-        { id: 'ai_analyze', type: 'ai', label: 'AI Trend & Revenue Analysis', config: { prompt: 'Analyze daily sales trends and key drivers' } },
-        { id: 'action_report', type: 'action', label: 'Generate PDF Report', config: { action_type: 'generate_report' } },
-        { id: 'notify_execs', type: 'notification', label: 'Notify Executive Team', config: { channel: 'email', message: 'Daily sales summary is ready' } },
-      ],
-      edges: [
-        { source: 'trigger', target: 'tool_db' },
-        { source: 'tool_db', target: 'ai_analyze' },
-        { source: 'ai_analyze', target: 'action_report' },
-        { source: 'action_report', target: 'notify_execs' },
-      ],
-    },
-  },
-  {
-    id: 'document_processing',
-    name: 'Multimodal Document & Invoice Processing',
-    tag: 'OCR & RAG',
-    description:
-      'Upload Scanned PDF/Image -> Vision OCR Extraction -> Classify & Embed -> Vector Knowledge Store -> Generate Summary.',
-    nodesCount: 5,
-    icon: '📄',
-    definition: {
-      nodes: [
-        { id: 'trigger', type: 'trigger', label: 'Document Upload Trigger', config: { event: 'document_upload' } },
-        { id: 'tool_ocr', type: 'tool', label: 'Vision OCR Extraction', config: { tool_name: 'file', action: 'ocr_analyze' } },
-        { id: 'ai_extract', type: 'ai', label: 'Extract Line Items & Totals', config: { prompt: 'Extract structured vendor, date, and invoice totals' } },
-        { id: 'action_store', type: 'action', label: 'Save to Knowledge Base', config: { action_type: 'store_knowledge' } },
-        { id: 'notify_user', type: 'notification', label: 'Notify Ingestion Complete', config: { message: 'Document embedded in RAG' } },
-      ],
-      edges: [
-        { source: 'trigger', target: 'tool_ocr' },
-        { source: 'tool_ocr', target: 'ai_extract' },
-        { source: 'ai_extract', target: 'action_store' },
-        { source: 'action_store', target: 'notify_user' },
-      ],
-    },
-  },
-  {
-    id: 'lead_processing',
-    name: 'Inbound Lead Enrichment & CRM Scoring',
-    tag: 'GROWTH',
-    description:
-      'New Webhook Lead -> Web Search Company Intelligence -> AI Lead Scoring -> Create CRM Contact -> Notify Sales Rep.',
-    nodesCount: 5,
-    icon: '🎯',
-    definition: {
-      nodes: [
-        { id: 'trigger', type: 'trigger', label: 'New Webhook Lead Event', config: { event: 'webhook_lead' } },
-        { id: 'tool_web', type: 'tool', label: 'Research Company Background', config: { tool_name: 'web_search' } },
-        { id: 'ai_score', type: 'ai', label: 'Score Lead Quality (1-100)', config: { prompt: 'Score lead qualification based on company size and market fit' } },
-        { id: 'tool_crm_create', type: 'tool', label: 'Create CRM Customer', config: { tool_name: 'crm', action: 'create' } },
-        { id: 'notify_sales', type: 'notification', label: 'Alert Sales Account Exec', config: { message: 'High score lead qualified' } },
-      ],
-      edges: [
-        { source: 'trigger', target: 'tool_web' },
-        { source: 'tool_web', target: 'ai_score' },
-        { source: 'ai_score', target: 'tool_crm_create' },
-        { source: 'tool_crm_create', target: 'notify_sales' },
-      ],
-    },
-  },
-];
 
 export default function WorkflowTemplatesScreen() {
   const router = useRouter();
+  const [templates, setTemplates] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    const loadTemplates = async () => {
+      try {
+        const token = await getAccessToken();
+        const data = await listWorkflowTemplates(token);
+        if (mounted) {
+          setTemplates(data || []);
+        }
+      } catch (error) {
+        if (mounted) {
+          Alert.alert('Templates unavailable', error?.message || 'Unable to load workflow templates.');
+          setTemplates([]);
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
+    loadTemplates();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const handleUseTemplate = async (template) => {
     try {
@@ -151,31 +80,43 @@ export default function WorkflowTemplatesScreen() {
         </Text>
       </View>
 
-      <View style={styles.list}>
-        {TEMPLATES.map((tmpl) => (
-          <View key={tmpl.id} style={styles.card}>
-            <View style={styles.cardHeader}>
-              <Text style={styles.icon}>{tmpl.icon}</Text>
-              <View style={styles.badge}>
-                <Text style={styles.badgeText}>{tmpl.tag}</Text>
+      {loading ? (
+        <View style={styles.loadingWrapper}>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+        </View>
+      ) : (
+        <View style={styles.list}>
+          {templates.length === 0 ? (
+            <View style={styles.emptyCard}>
+              <Text style={styles.emptyText}>No workflow templates available.</Text>
+            </View>
+          ) : (
+            templates.map((tmpl) => (
+              <View key={tmpl.id || tmpl.name} style={styles.card}>
+                <View style={styles.cardHeader}>
+                  <Text style={styles.icon}>{tmpl.icon || '📋'}</Text>
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText}>{tmpl.tag || 'WORKFLOW'}</Text>
+                  </View>
+                </View>
+
+                <Text style={styles.name}>{tmpl.name}</Text>
+                <Text style={styles.description}>{tmpl.description}</Text>
+
+                <View style={styles.footerRow}>
+                  <Text style={styles.nodesCount}>{tmpl.nodes_count || tmpl.definition?.nodes?.length || 0} Pipeline Steps</Text>
+                  <TouchableOpacity
+                    style={styles.useBtn}
+                    onPress={() => handleUseTemplate(tmpl)}
+                  >
+                    <Text style={styles.useBtnText}>Use Template →</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-            </View>
-
-            <Text style={styles.name}>{tmpl.name}</Text>
-            <Text style={styles.description}>{tmpl.description}</Text>
-
-            <View style={styles.footerRow}>
-              <Text style={styles.nodesCount}>{tmpl.nodesCount} Pipeline Steps</Text>
-              <TouchableOpacity
-                style={styles.useBtn}
-                onPress={() => handleUseTemplate(tmpl)}
-              >
-                <Text style={styles.useBtnText}>Use Template →</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        ))}
-      </View>
+            ))
+          )}
+        </View>
+      )}
     </ScrollView>
   );
 }

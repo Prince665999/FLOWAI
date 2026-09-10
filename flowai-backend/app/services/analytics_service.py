@@ -65,14 +65,14 @@ class AnalyticsService:
             "failed_workflows": failed_runs,
             "awaiting_approval": awaiting_approval_runs,
             "tasks_automated": total_tasks_automated,
-            "hours_saved": max(hours_saved, 14.2),  # realistic baseline
-            "ai_cost_usd": round(cost_sum + 2.31, 2),  # baseline + tracked
+            "hours_saved": round(hours_saved, 1),
+            "ai_cost_usd": round(float(cost_sum or 0.0), 2),
             "human_approvals_total": total_approvals,
             "human_approvals_pending": pending_approvals,
             "success_rate_percent": success_rate,
             "human_intervention_rate_percent": human_intervention_rate,
-            "customers_processed": max(total_customers, 28),
-            "average_duration_seconds": 4.2,
+            "customers_processed": int(total_customers),
+            "average_duration_seconds": 0.0,
         }
 
     def get_cost_breakdown(self, db: Session, user: User) -> list[dict]:
@@ -90,22 +90,7 @@ class AnalyticsService:
         )
 
         if not records:
-            return [
-                {
-                    "model_name": "gemini-1.5-flash",
-                    "input_tokens": 124000,
-                    "output_tokens": 38000,
-                    "estimated_cost_usd": 0.84,
-                    "calls_count": 82,
-                },
-                {
-                    "model_name": "gemini-1.5-pro",
-                    "input_tokens": 42000,
-                    "output_tokens": 18500,
-                    "estimated_cost_usd": 1.47,
-                    "calls_count": 14,
-                },
-            ]
+            return []
 
         return [
             {

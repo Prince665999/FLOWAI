@@ -20,6 +20,16 @@ def test_cost_calculation_and_recording(db_session):
     assert record.estimated_cost_usd > 0
 
 
+def test_analytics_empty_state_uses_real_zero_values(db_session):
+    user = db_session.query(User).filter(User.id == 1).first()
+    overview = analytics_service.get_business_overview(db_session, user)
+
+    assert overview["hours_saved"] == 0
+    assert overview["ai_cost_usd"] == 0
+    assert overview["customers_processed"] == 0
+    assert analytics_service.get_cost_breakdown(db_session, user) == []
+
+
 def test_analytics_and_notifications(db_session):
     user = db_session.query(User).filter(User.id == 1).first()
     overview = analytics_service.get_business_overview(db_session, user)

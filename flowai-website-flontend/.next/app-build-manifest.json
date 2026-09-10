@@ -21,30 +21,20 @@
       "static/chunks/main-app.js",
       "static/chunks/app/(auth)/login/page.js"
     ],
-    "/(customer)/support/page": [
+    "/(public)/products/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(customer)/support/page.js"
-    ],
-    "/(auth)/register/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(auth)/register/page.js"
-    ],
-    "/(customer)/assistant/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(customer)/assistant/page.js"
+      "static/chunks/app/(public)/products/page.js"
     ],
     "/(public)/search/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/(public)/search/page.js"
     ],
-    "/(public)/products/[slug]/page": [
+    "/(customer)/assistant/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(public)/products/[slug]/page.js"
+      "static/chunks/app/(customer)/assistant/page.js"
     ]
   }
 }

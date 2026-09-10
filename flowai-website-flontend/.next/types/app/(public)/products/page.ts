@@ -1,8 +1,8 @@
-// File: C:\Users\Prince\Desktop\FLOWAI - Copy\flowai-website-flontend\src\app\(auth)\register\page.tsx
-import * as entry from '../../../../../src/app/(auth)/register/page.js'
+// File: C:\Users\Prince\Desktop\FLOWAI - Copy\flowai-website-flontend\src\app\(public)\products\page.tsx
+import * as entry from '../../../../../src/app/(public)/products/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
-type TEntry = typeof import('../../../../../src/app/(auth)/register/page.js')
+type TEntry = typeof import('../../../../../src/app/(public)/products/page.js')
 
 // Check that the entry is a valid entry
 checkFields<Diff<{

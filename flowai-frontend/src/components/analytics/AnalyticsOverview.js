@@ -17,7 +17,7 @@ export default function AnalyticsOverview({ data }) {
         <View style={[styles.card, { borderColor: theme.colors.success + '44' }]}>
           <Text style={styles.cardLabel}>TIME SAVED</Text>
           <Text style={[styles.cardValue, { color: theme.colors.success }]}>
-            {data.hours_saved || 14}h
+            {Number(data.hours_saved ?? 0)}h
           </Text>
           <Text style={styles.cardSub}>~10 min per task</Text>
         </View>
@@ -26,7 +26,7 @@ export default function AnalyticsOverview({ data }) {
         <View style={[styles.card, { borderColor: theme.colors.primaryLight + '44' }]}>
           <Text style={styles.cardLabel}>AI COST</Text>
           <Text style={[styles.cardValue, { color: theme.colors.primaryLight }]}>
-            ${(data.ai_cost_usd || 2.31).toFixed(2)}
+            ${Number(data.ai_cost_usd ?? 0).toFixed(2)}
           </Text>
           <Text style={styles.cardSub}>Total token compute</Text>
         </View>

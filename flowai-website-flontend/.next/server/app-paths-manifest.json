@@ -1,10 +1,10 @@
 {
   "/page": "app/page.js",
-  "/(auth)/login/page": "app/(auth)/login/page.js",
-  "/(customer)/support/page": "app/(customer)/support/page.js",
-  "/(auth)/register/page": "app/(auth)/register/page.js",
-  "/(customer)/assistant/page": "app/(customer)/assistant/page.js",
-  "/(public)/products/[slug]/page": "app/(public)/products/[slug]/page.js",
   "/api/auth/me/route": "app/api/auth/me/route.js",
-  "/api/v1/[...path]/route": "app/api/v1/[...path]/route.js"
+  "/(auth)/login/page": "app/(auth)/login/page.js",
+  "/api/auth/login/route": "app/api/auth/login/route.js",
+  "/(public)/products/page": "app/(public)/products/page.js",
+  "/api/v1/[...path]/route": "app/api/v1/[...path]/route.js",
+  "/(public)/search/page": "app/(public)/search/page.js",
+  "/(customer)/assistant/page": "app/(customer)/assistant/page.js"
 }

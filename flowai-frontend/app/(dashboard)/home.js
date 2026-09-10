@@ -26,14 +26,16 @@ export default function DashboardHomeScreen() {
   const [pendingApprovals, setPendingApprovals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState(null);
 
   const loadDashboardData = useCallback(async () => {
     try {
+      setError(null);
       const [custList, wfList, analyticsData, appList] = await Promise.all([
-        listCustomers().catch(() => []),
-        getWorkflows().catch(() => []),
-        getAnalyticsOverview().catch(() => null),
-        getApprovals('pending').catch(() => []),
+        listCustomers(),
+        getWorkflows(),
+        getAnalyticsOverview(),
+        getApprovals('pending'),
       ]);
       setCustomers(custList || []);
       setWorkflows(wfList || []);
@@ -41,6 +43,7 @@ export default function DashboardHomeScreen() {
       setPendingApprovals(appList || []);
     } catch (err) {
       console.error('Failed to load dashboard:', err);
+      setError(err?.message || 'Unable to load dashboard data.');
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -67,6 +70,11 @@ export default function DashboardHomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {error ? (
+        <View style={styles.errorBanner}>
+          <Text style={styles.errorText}>{error}</Text>
+        </View>
+      ) : null}
       <ScrollView
         contentContainerStyle={styles.content}
         refreshControl={
